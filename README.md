@@ -56,8 +56,6 @@ Sistemi en verimli şekilde kullanmak için aşağıdaki sırayı takip etmeniz 
 
 [YENİ] Kahve Desteği: "Destek" sekmesine geliştiriciye destek olmak için "Buy Me a Coffee" butonu eklendi.
 
-[YENİ] Otomatik Büyük Harf: Veri girişlerinde standart sağlamak için tüm isim ve ders girişleri otomatik büyük harfe sabitlendi.
-
 [DÜZELTME] Çakışma Kontrolü: Aynı tarih ve saatte bir öğretmene birden fazla görev verilmesi engellendi.
 
 [İYİLEŞTİRME] PDF Tasarımı: Resmi yazı formatına uygun, okul müdürü imzalı görev tebliğ belgesi tasarımı güncellendi.
