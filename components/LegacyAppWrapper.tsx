@@ -513,14 +513,85 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
                         </div>
                     </div>
 
-                    <div className="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-200 text-center">
-                        <div className="bg-blue-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner"><BookOpen className="text-blue-600 w-10 h-10" /></div>
-                        <h2 className="text-2xl font-black text-slate-800 uppercase mb-4 tracking-tighter">Destek ve Kullanım Kılavuzu</h2>
-                        <p className="text-slate-500 text-sm mb-10 leading-relaxed max-w-2xl mx-auto italic font-medium">Sistemin kullanımı hakkında detaylı bilgi, video anlatımlar ve teknik destek için GitHub sayfamızı ziyaret edebilirsiniz.</p>
-                        <a href="https://github.com/kdavut/sorumluluk_sinavlari_paneli/blob/main/README.md" target="_blank" className="inline-flex items-center gap-4 bg-slate-900 text-white px-10 py-5 rounded-2xl font-black text-xs uppercase shadow-2xl hover:bg-blue-600 transition-all active:scale-95 group">
-                            <BookOpen className="w-5 h-5 transition-transform group-hover:rotate-12" />
-                            GitHub Kılavuzu Görüntüle
-                        </a>
+                    <div className="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-200 text-left space-y-8 animate-in fade-in duration-700">
+                        <div className="border-b pb-6">
+                            <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tighter mb-4">SORUMLULUK SINAVI YÖNETİM PANELİ</h2>
+                            <p className="text-slate-600 text-sm leading-relaxed font-medium italic">
+                                Bu sistem, okulumuzdaki sorumluluk sınavlarının planlanması, öğretmen görevlendirmelerinin adil bir şekilde dağıtılması ve resmi belgelerin (görev tebliğ kağıtları, sınav programı vb.) hızlıca oluşturulması için tasarlanmıştır. Geliştirici Davut KILIÇ'a destek olmak için <a href="https://buymeacoffee.com/kdavut" target="_blank" className="text-blue-600 underline font-bold">https://buymeacoffee.com/kdavut</a> adresine tıklayabilirsiniz.
+                            </p>
+                        </div>
+
+                        <div className="space-y-8">
+                            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter flex items-center gap-2">🚀 Hızlı Başlangıç Adımları</h3>
+                            
+                            <div className="space-y-8 text-sm text-slate-600">
+                                <div>
+                                    <h4 className="font-black text-slate-900 text-sm mb-1">Genel ayarların yapılandırılması (Ayarlar sekmesi)</h4>
+                                    <p>Okul Bilgileri: Okul adı, sınav dönemi ve okul müdürü bilgilerini girin. Bu bilgiler tüm resmi çıktılarda (Görev Kağıtları, Program vb.) otomatik olarak kullanılır.</p>
+                                    <p className="font-black text-slate-900 text-sm mb-1 italic">Tarih ve saati sadece bir kez Ayarlar sekmesinden girin. Sınavları girerken sadece o tarih ve saat çıkacaktır</p>
+                                </div>
+
+                                <div>
+                                    <h4 className="font-black text-slate-900 text-sm mb-1">Öğretmen kadrosunu oluşturma (Öğretmenler sekmesi)</h4>
+                                    <p>Sınavlarda görev alacak tüm öğretmenleri Ad Soyad ve Branş bilgileriyle sisteme kaydedin. Listeden bir isme tıklayarak bilgilerini güncelleyebilir veya silebilirsiniz.</p>
+                                </div>
+
+                                <div>
+                                    <h4 className="font-black text-slate-900 text-sm mb-1">Sınavların tanımlanması (Sınav girişi sekmesi)</h4>
+                                    <p>Ders ve Seviye: Sınavı yapılacak dersi ve sınıf seviyesini seçin.</p>
+                                    <p>Görevli Atama: Sistem, seçtiğiniz tarih ve saatte başka bir sınavda görevi olan öğretmenleri listede göstermez (Çakışma Kontrolü).</p>
+                                    <p>Komisyon ve Gözetmen: İhtiyaca göre görevli sayılarını artırıp azaltabilirsiniz.</p>
+                                </div>
+
+                                <div>
+                                    <h4 className="font-black text-slate-900 text-sm mb-1">Takip ve istatistikler (Görev sayıları sekmesi)</h4>
+                                    <p>Bu sekmeden hangi öğretmenin kaç komisyon, kaç gözetmenlik görevi aldığını anlık olarak görebilirsiniz. Adil bir görev dağılımı yapmak için "Toplam" sütununu takip edebilirsiniz.</p>
+                                </div>
+
+                                <div>
+                                    <h4 className="font-black text-slate-900 text-sm mb-1">Yazdırma ve tebliğ (Görev kağıdı sekmesi)</h4>
+                                    <div className="space-y-2">
+                                        <p><strong>Tekli Yazdır:</strong> İstediğiniz öğretmenin görev belgesini hazırlar.</p>
+                                        <p><strong>Tümünü Yazdır:</strong> Tüm görevli öğretmenlerin belgelerini arka arkaya, her öğretmen yeni bir sayfaya gelecek şekilde PDF olarak hazırlar.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4 bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter flex items-center gap-2">💾 Veri Güvenliği ve Yedekleme</h3>
+                            <p className="text-sm text-slate-600 leading-relaxed">Sistem verileri Firebase ve tarayıcınızda tutar. Bilgisayar değişikliği yapacaksanız veya verileri garantiye almak istiyorsanız "Destek ve Yedekleme" sekmesini kullanın:</p>
+                            <ul className="text-sm text-slate-600 space-y-2 list-none pl-1">
+                                <li>-- <strong>Yedekle:</strong> Mevcut tüm sınav ve öğretmen verilerini .json dosyası olarak bilgisayarınıza indirir.</li>
+                                <li>-- <strong>Geri Yükle:</strong> Daha önce aldığınız yedek dosyasını sisteme geri yükler.</li>
+                                <li>-- <strong>Sıfırla:</strong> Yeni bir sınav dönemi başlangıcında tüm eski kayıtları temizlemek için kullanılır.</li>
+                            </ul>
+                        </div>
+
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter flex items-center gap-2">🛠️ Son Yapılan Güncellemeler (Sürüm Notları)</h3>
+                            <div className="text-sm text-slate-600 space-y-3 font-medium">
+                                <div className="flex gap-2">
+                                    <span className="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-[10px] font-black h-fit">DÜZELTME</span>
+                                    <p><strong>Çakışma Kontrolü:</strong> Aynı tarih ve saatte bir öğretmene birden fazla görev verilmesi engellendi.</p>
+                                </div>
+                                <div className="flex gap-2">
+                                    <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[10px] font-black h-fit">İYİLEŞTİRME</span>
+                                    <p><strong>PDF Tasarımı:</strong> Resmi yazı formatına uygun, okul müdürü imzalı görev tebliğ belgesi tasarımı güncellendi.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="pt-8 border-t border-slate-100 text-center space-y-4">
+                            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter flex items-center justify-center gap-2">☕ Destek</h3>
+                            <p className="text-sm text-slate-500 italic max-w-xl mx-auto leading-relaxed">
+                                Bu sistem tamamen okul ihtiyaçları doğrultusunda geliştirilmiştir. Memnun kaldıysanız Destek sekmesinden bir kahve ısmarlayarak katkıda bulunabilirsiniz!
+                            </p>
+                            <a href="https://buymeacoffee.com/kdavut" target="_blank" className="inline-flex items-center gap-3 bg-[#FFDD00] text-black px-8 py-4 rounded-2xl font-black text-xs uppercase shadow-xl hover:bg-[#FFCC00] transition-all group active:scale-95">
+                                <Coffee className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                                KAHVE ISMARLA (BU ME A COFFEE)
+                            </a>
+                        </div>
                     </div>
                 </div>
             )}
