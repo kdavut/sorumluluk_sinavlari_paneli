@@ -6,7 +6,7 @@ import { UserProfile } from '../types';
 import { 
   ShieldCheck, Settings, Users, PlusCircle, BarChart3, 
   Printer, HelpCircle, LogOut, Trash2, Download, 
-  Upload, BookOpen, Coffee 
+  Upload, BookOpen, Coffee, Edit, UserPlus
 } from 'lucide-react';
 
 interface LegacyAppWrapperProps {
@@ -321,19 +321,28 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
                 <div className="grid lg:grid-cols-4 gap-8 animate-in slide-in-from-bottom-4 duration-500">
                     <div className="lg:col-span-1">
                         <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 sticky top-28">
-                            <h2 className="text-xs font-black text-slate-800 uppercase border-b pb-2 mb-4">{teacherForm.id ? "Düzenle" : "Öğretmen Ekle"}</h2>
+                            <h2 className="text-xs font-black text-slate-800 uppercase border-b pb-2 mb-4 flex items-center gap-2">
+                                {teacherForm.id ? <Edit className="w-3.5 h-3.5"/> : <UserPlus className="w-3.5 h-3.5"/>}
+                                {teacherForm.id ? "Düzenle" : "Öğretmen Ekle"}
+                            </h2>
                             <form onSubmit={handleAddOrUpdateTeacher} className="space-y-4">
-                                <div><label className="text-[10px] font-black text-slate-400 uppercase block mb-1">Ad Soyad</label><input required type="text" value={teacherForm.name} onChange={e => setTeacherForm({...teacherForm, name: e.target.value})} className="w-full p-2.5 bg-slate-50 border rounded-xl text-xs font-bold outline-none" /></div>
-                                <div><label className="text-[10px] font-black text-slate-400 uppercase block mb-1">Branş</label><input type="text" value={teacherForm.branch} onChange={e => setTeacherForm({...teacherForm, branch: e.target.value})} className="w-full p-2.5 bg-slate-50 border rounded-xl text-xs font-bold outline-none" /></div>
+                                <div><label className="text-[10px] font-black text-slate-400 uppercase block mb-1">Ad Soyad</label><input required type="text" value={teacherForm.name} onChange={e => setTeacherForm({...teacherForm, name: e.target.value})} className="w-full p-2.5 bg-slate-50 border rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-blue-400" /></div>
+                                <div><label className="text-[10px] font-black text-slate-400 uppercase block mb-1">Branş</label><input type="text" value={teacherForm.branch} onChange={e => setTeacherForm({...teacherForm, branch: e.target.value})} className="w-full p-2.5 bg-slate-50 border rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-blue-400" /></div>
                                 <button className="w-full bg-slate-900 text-white py-3 rounded-2xl font-black text-xs uppercase shadow-xl hover:opacity-90 active:scale-95 transition-all">{teacherForm.id ? "Güncelle" : "Ekle"}</button>
                             </form>
                         </div>
                     </div>
                     <div className="lg:col-span-3">
                         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div className="p-6 border-b flex justify-between items-center bg-slate-50">
+                                <h2 className="text-xs font-black text-slate-800 uppercase">Öğretmen Listesi (Branşa Göre)</h2>
+                                <button onClick={() => runPrint('teacher_list_pdf')} className="bg-red-600 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase flex items-center gap-2 hover:bg-red-700 transition">
+                                    <Printer className="w-3.5 h-3.5" /> Listeyi Yazdır
+                                </button>
+                            </div>
                             <table className="w-full text-left text-sm font-bold">
                                 <thead className="bg-slate-50 border-b text-[10px] font-black text-slate-400 uppercase"><tr><th className="p-4">Branş</th><th className="p-4">Ad Soyad</th><th className="p-4 text-center">İşlem</th></tr></thead>
-                                <tbody className="divide-y divide-slate-100">{sortedTeachers.map(t => (<tr key={t.id} onClick={() => setTeacherForm({ id: t.id, name: t.name, branch: t.branch })} className="hover:bg-slate-50 cursor-pointer"><td className="p-4 text-xs text-blue-600">{t.branch}</td><td className="p-4">{t.name}</td><td className="p-4 text-center"><button onClick={(e) => { e.stopPropagation(); setTeachers(teachers.filter(x => x.id !== t.id)); }} className="text-slate-300 hover:text-red-500"><Trash2 className="w-4 h-4" /></button></td></tr>))}</tbody>
+                                <tbody className="divide-y divide-slate-100">{sortedTeachers.map(t => (<tr key={t.id} onClick={() => setTeacherForm({ id: t.id, name: t.name, branch: t.branch })} className="hover:bg-slate-50 cursor-pointer transition-colors"><td className="p-4 text-xs text-blue-600">{t.branch}</td><td className="p-4">{t.name}</td><td className="p-4 text-center"><button onClick={(e) => { e.stopPropagation(); setTeachers(teachers.filter(x => x.id !== t.id)); }} className="text-slate-300 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button></td></tr>))}</tbody>
                             </table>
                         </div>
                     </div>
@@ -378,10 +387,67 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
                         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
                             <table className="w-full text-left text-xs font-bold">
                                 <thead className="bg-slate-50 border-b uppercase font-black text-slate-400 text-[10px]"><tr><th className="p-4">Tarih/Saat</th><th className="p-4">Ders / Seviye</th><th className="p-4">Görevliler</th><th className="p-4 text-center">İşlem</th></tr></thead>
-                                <tbody className="divide-y divide-slate-100">{sortedExams.map(ex => (<tr key={ex.id} onClick={() => { setEditingId(ex.id); setNewExam({...ex}); }} className={`hover:bg-slate-50 cursor-pointer ${editingId === ex.id ? 'bg-blue-50 border-l-4 border-blue-600' : ''}`}><td className="p-4"><b>{new Date(ex.date).toLocaleDateString('tr-TR')}</b><br/><span className="text-blue-600">{ex.time}</span></td><td className="p-4 uppercase">{ex.subject}<br/><span className="text-slate-400 text-[9px]">{ex.grade}</span></td><td className="p-4"><div className="flex flex-wrap gap-1">{ex.examiners.filter((n:any)=>n).map((n:any, i:any) => <span key={i} className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-lg text-[9px]">A: {n}</span>)}{ex.proctors.filter((n:any)=>n).map((n:any, i:any) => <span key={i} className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-lg text-[9px]">G: {n}</span>)}</div></td><td className="p-4 text-center"><button onClick={(e) => { e.stopPropagation(); setExams(exams.filter(x => x.id !== ex.id)); }} className="text-slate-300 hover:text-red-500"><Trash2 className="w-4 h-4" /></button></td></tr>))}</tbody>
+                                <tbody className="divide-y divide-slate-100">{sortedExams.map(ex => (<tr key={ex.id} onClick={() => { setEditingId(ex.id); setNewExam({...ex}); }} className={`hover:bg-slate-50 cursor-pointer transition-colors ${editingId === ex.id ? 'bg-blue-50 border-l-4 border-blue-600' : ''}`}><td className="p-4"><b>{new Date(ex.date).toLocaleDateString('tr-TR')}</b><br/><span className="text-blue-600">{ex.time}</span></td><td className="p-4 uppercase">{ex.subject}<br/><span className="text-slate-400 text-[9px]">{ex.grade}</span></td><td className="p-4"><div className="flex flex-wrap gap-1">{ex.examiners.filter((n:any)=>n).map((n:any, i:any) => <span key={i} className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-lg text-[9px]">A: {n}</span>)}{ex.proctors.filter((n:any)=>n).map((n:any, i:any) => <span key={i} className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-lg text-[9px]">G: {n}</span>)}</div></td><td className="p-4 text-center"><button onClick={(e) => { e.stopPropagation(); setExams(exams.filter(x => x.id !== ex.id)); }} className="text-slate-300 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button></td></tr>))}</tbody>
                             </table>
                         </div>
                     </div>
+                </div>
+            )}
+
+            {activeTab === 'stats' && (
+                <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden max-w-5xl mx-auto animate-in zoom-in duration-500">
+                    <div className="p-6 border-b flex justify-between items-center bg-slate-50">
+                        <h2 className="text-xs font-black text-slate-800 uppercase">Öğretmen Görev Dağılım İstatistikleri</h2>
+                        <button onClick={() => runPrint('stats_pdf')} className="bg-red-600 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase flex items-center gap-2 hover:bg-red-700 transition">
+                            <Printer className="w-4 h-4" /> Çizelgeyi Yazdır
+                        </button>
+                    </div>
+                    <table className="w-full text-left text-sm">
+                        <thead className="bg-white border-b text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            <tr><th className="p-4">Öğretmen Adı Soyadı</th><th className="p-4 text-center">Komisyon</th><th className="p-4 text-center">Gözetmenlik</th><th className="p-4 text-center">Toplam</th></tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 font-bold text-slate-700">
+                            {teacherStats.map(t => (
+                                <tr key={t.id} className="hover:bg-slate-50 transition-colors">
+                                    <td className="p-4">{t.name} <span className="text-[10px] text-slate-300 ml-2 font-normal uppercase">{t.branch}</span></td>
+                                    <td className="p-4 text-center text-blue-600">{t.examiner}</td>
+                                    <td className="p-4 text-center text-emerald-600">{t.proctor}</td>
+                                    <td className="p-4 text-center"><span className="bg-slate-100 px-3 py-1 rounded-lg">{t.total}</span></td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+
+            {activeTab === 'task_paper' && (
+                <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden max-w-4xl mx-auto animate-in fade-in duration-700">
+                    <div className="p-6 border-b flex justify-between items-center bg-slate-50">
+                        <h2 className="text-xs font-black text-slate-800 uppercase">Resmi Görev Tebliğ Listesi</h2>
+                        <button onClick={() => runPrint('all_tasks')} className="bg-red-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase hover:bg-red-700 transition flex items-center gap-2 shadow-lg">
+                            <Printer className="w-4 h-4" /> TÜMÜNÜ YAZDIR
+                        </button>
+                    </div>
+                    <table className="w-full text-left text-sm font-bold">
+                        <thead className="bg-white border-b text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            <tr><th className="p-4">Öğretmen Adı Soyadı</th><th className="p-4 text-center">Görev Sayısı</th><th className="p-4 text-center">İşlem</th></tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 text-slate-700">
+                            {teacherStats.filter(t => t.total > 0).map(t => (
+                                <tr key={t.id} className="hover:bg-slate-50 transition-colors">
+                                    <td className="p-4">{t.name} <br/><span className="text-[10px] text-slate-400 normal-case font-medium">{t.branch}</span></td>
+                                    <td className="p-4 text-center">
+                                        <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-[10px] font-black">{t.total} GÖREV</span>
+                                    </td>
+                                    <td className="p-4 text-center">
+                                        <button onClick={() => runPrint('single_task', t)} className="bg-slate-100 text-slate-900 px-4 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-slate-200 transition-colors mx-auto flex items-center gap-2">
+                                            <Printer className="w-3 h-3" /> YAZDIR
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             )}
 
@@ -421,7 +487,7 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
                         <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col items-center text-center">
                             <div className="bg-red-50 w-12 h-12 rounded-2xl flex items-center justify-center mb-4"><Trash2 className="text-red-600 w-6 h-6" /></div>
                             <h3 className="font-black text-slate-800 uppercase text-xs mb-2">Sıfırla</h3>
-                            <button onClick={() => { if(confirm("Emin misiniz?")) { setExams([]); setTeachers([]); showNotification("Sıfırlandı."); } }} className="w-full bg-red-50 text-red-600 py-3 rounded-xl font-black text-[10px] uppercase">Verileri Sil</button>
+                            <button onClick={() => { if(confirm("Tüm veriler silinecektir, emin misiniz?")) { setExams([]); setTeachers([]); showNotification("Sıfırlandı."); } }} className="w-full bg-red-50 text-red-600 py-3 rounded-xl font-black text-[10px] uppercase">Verileri Sil</button>
                         </div>
                     </div>
 
@@ -466,6 +532,30 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
                     </table>
                 </div>
             )}
+            {printMode === 'teacher_list_pdf' && (
+                <div className="print-container p-4">
+                    <div className="text-center mb-6">
+                        <h1 className="text-lg font-bold uppercase">{settings.schoolName}</h1>
+                        <h2 className="text-sm font-bold uppercase underline">ÖĞRETMEN LİSTESİ</h2>
+                    </div>
+                    <table className="program-table-print">
+                        <thead><tr><th className="w-16">Sıra</th><th>Branşı</th><th>Öğretmen Adı Soyadı</th></tr></thead>
+                        <tbody>{sortedTeachers.map((t, idx) => (<tr key={idx}><td>{idx + 1}</td><td>{t.branch}</td><td>{t.name}</td></tr>))}</tbody>
+                    </table>
+                </div>
+            )}
+            {printMode === 'stats_pdf' && (
+                <div className="print-container p-4">
+                    <div className="text-center mb-6">
+                        <h1 className="text-lg font-bold uppercase">{settings.schoolName}</h1>
+                        <h2 className="text-sm font-bold uppercase underline">GÖREV DAĞILIM ÇİZELGESİ</h2>
+                    </div>
+                    <table className="program-table-print">
+                        <thead><tr><th>Öğretmen Adı Soyadı</th><th>Branş</th><th>Komisyon</th><th>Gözetmenlik</th><th>Toplam</th></tr></thead>
+                        <tbody>{teacherStats.map((t, idx) => (<tr key={idx}><td>{t.name}</td><td>{t.branch}</td><td className="text-center">{t.examiner}</td><td className="text-center">{t.proctor}</td><td className="text-center font-bold">{t.total}</td></tr>))}</tbody>
+                    </table>
+                </div>
+            )}
             {(printMode === 'all_tasks' || printMode === 'single_task') && (printMode === 'all_tasks' ? teacherStats.filter(t => t.total > 0) : [selectedTeacherForPaper]).filter(t => t).map((t: any, index: number) => (
                 <div key={t.id} className={`print-container ${index !== 0 ? 'page-break' : ''}`}>
                     <TaskPaperTemplate teacher={t} />
@@ -479,9 +569,10 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
                 .print-only { display: block !important; }
                 body { background-color: white; margin: 0; padding: 0; }
                 @page { margin: 1.5cm; }
-                .task-card-full { min-height: 250mm; display: flex; flex-direction: column; justify-content: space-between; }
+                .task-card-full { min-height: 250mm; display: flex; flex-direction: column; justify-content: space-between; padding: 10mm; }
                 .program-table-print { width: 100%; border-collapse: collapse; margin-top: 20px; }
                 .program-table-print th, .program-table-print td { border: 1px solid black; padding: 6px; font-size: 9pt; text-align: left; }
+                .program-table-print th { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; }
                 .page-break { page-break-before: always; }
             }
             .print-only { display: none; }
