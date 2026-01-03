@@ -1,24 +1,18 @@
 SORUMLULUK SINAVI YÖNETİM PANELİ
 
-Bu sistem, okulumuzdaki sorumluluk sınavlarının planlanması, öğretmen görevlendirmelerinin adil bir şekilde dağıtılması ve resmi belgelerin (görev tebliğ kağıtları, sınav programı vb.) hızlıca oluşturulması için tasarlanmıştır.
+Bu sistem, okulumuzdaki sorumluluk sınavlarının planlanması, öğretmen görevlendirmelerinin adil bir şekilde dağıtılması ve resmi belgelerin (görev tebliğ kağıtları, sınav programı vb.) hızlıca oluşturulması için tasarlanmıştır. Geliştirici Davut KILIÇ'a destek olmak için  https://buymeacoffee.com/kdavut adresine tıklayabilirsiniz.
 
 🚀 Hızlı Başlangıç Adımları
-
-Sistemi en verimli şekilde kullanmak için aşağıdaki sırayı takip etmeniz önerilir:
 
 1. Genel Ayarların Yapılandırılması (Ayarlar Sekmesi)
 
 - Okul Bilgileri: Okul adı, sınav dönemi ve okul müdürü bilgilerini girin. Bu bilgiler tüm resmi çıktılarda (Görev Kağıtları, Program vb.) otomatik olarak kullanılır.
 
-- Takvim Tanımları: Sınavların yapılacağı tarihleri takvimden seçerek ekleyin.
-
-- Saat Tanımları: Sınav saatlerini (örn: 10:00, 14:30) listeye ekleyin.
+- TARİH VE SAATİ BİR KEZ GİRİN VE AÇILIR MENÜDE SADECE ONLAR ÇIKACAK
 
 2. Öğretmen Kadrosunu Oluşturma (Öğretmenler Sekmesi)
 
 - Sınavlarda görev alacak tüm öğretmenleri Ad Soyad ve Branş bilgileriyle sisteme kaydedin.
-
-- Öğretmen isimleri sistemde otomatik olarak BÜYÜK HARFE dönüştürülür.
 
 - Listeden bir isme tıklayarak bilgilerini güncelleyebilir veya silebilirsiniz.
 
@@ -44,7 +38,7 @@ Sistemi en verimli şekilde kullanmak için aşağıdaki sırayı takip etmeniz 
 
 💾 Veri Güvenliği ve Yedekleme
 
-- Sistem verileri tarayıcınızda tutar. Bilgisayar değişikliği yapacaksanız veya verileri garantiye almak istiyorsanız "Destek ve Yedekleme" sekmesini kullanın:
+- Sistem verileri Firebase ve tarayıcınızda tutar. Bilgisayar değişikliği yapacaksanız veya verileri garantiye almak istiyorsanız "Destek ve Yedekleme" sekmesini kullanın:
 
 -- Yedekle: Mevcut tüm sınav ve öğretmen verilerini .json dosyası olarak bilgisayarınıza indirir.
 
@@ -54,7 +48,6 @@ Sistemi en verimli şekilde kullanmak için aşağıdaki sırayı takip etmeniz 
 
 🛠️ Son Yapılan Güncellemeler (Sürüm Notları)
 
-[YENİ] Kahve Desteği: "Destek" sekmesine geliştiriciye destek olmak için "Buy Me a Coffee" butonu eklendi.
 
 [DÜZELTME] Çakışma Kontrolü: Aynı tarih ve saatte bir öğretmene birden fazla görev verilmesi engellendi.
 
