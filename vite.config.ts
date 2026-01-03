@@ -4,6 +4,10 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  // GitHub Pages'de repo adınıza göre çalışması için göreceli yolları kullanır.
-  base: './', 
+  // Boş string veya './' kullanımı asset yollarının doğru çözülmesini sağlar
+  base: '', 
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+  }
 });
