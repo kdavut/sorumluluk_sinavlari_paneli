@@ -103,8 +103,9 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
     return teachers.map(t => {
       let p = 0, e = 0;
       exams.forEach(ex => {
-        if (ex.proctors && ex.proctors.includes(t.name)) p++;
-        if (ex.examiners && ex.examiners.includes(t.name)) e++;
+        // null/undefined kontrolü eklenerek verilerin gelmeme sorunu giderildi
+        if (ex.proctors && Array.isArray(ex.proctors) && ex.proctors.includes(t.name)) p++;
+        if (ex.examiners && Array.isArray(ex.examiners) && ex.examiners.includes(t.name)) e++;
       });
       return { ...t, proctor: p, examiner: e, total: p + e };
     }).sort((a, b) => b.total - a.total);
@@ -276,7 +277,7 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
                         { id: 'input', label: 'Sınav Girişi', icon: PlusCircle },
                         { id: 'stats', label: 'Görev Sayıları', icon: BarChart3 },
                         { id: 'task_paper', label: 'Görev Kağıdı', icon: Printer },
-                        { id: 'support', label: 'Destek', icon: HelpCircle }
+                        { id: 'support', label: 'Yedekle', icon: HelpCircle }
                     ].map(tab => (
                         <button 
                             key={tab.id} 
@@ -515,20 +516,10 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
                     <div className="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-200 text-center">
                         <div className="bg-blue-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner"><BookOpen className="text-blue-600 w-10 h-10" /></div>
                         <h2 className="text-2xl font-black text-slate-800 uppercase mb-4 tracking-tighter">Destek ve Kullanım Kılavuzu</h2>
-                        <p className="text-slate-500 text-sm mb-10 leading-relaxed max-w-2xl mx-auto italic font-medium">Sistemin kullanımı hakkında detaylı bilgi ve teknik destek için GitHub sayfamızı ziyaret edebilirsiniz.</p>
+                        <p className="text-slate-500 text-sm mb-10 leading-relaxed max-w-2xl mx-auto italic font-medium">Sistemin kullanımı hakkında detaylı bilgi, video anlatımlar ve teknik destek için GitHub sayfamızı ziyaret edebilirsiniz.</p>
                         <a href="https://github.com/kdavut/sorumluluk_sinavlari_paneli/blob/main/README.md" target="_blank" className="inline-flex items-center gap-4 bg-slate-900 text-white px-10 py-5 rounded-2xl font-black text-xs uppercase shadow-2xl hover:bg-blue-600 transition-all active:scale-95 group">
                             <BookOpen className="w-5 h-5 transition-transform group-hover:rotate-12" />
                             GitHub Kılavuzu Görüntüle
-                        </a>
-                    </div>
-
-                    <div className="bg-amber-50 p-10 rounded-[3rem] border border-amber-200 text-center shadow-sm">
-                        <div className="bg-amber-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"><Coffee className="text-amber-600 w-8 h-8" /></div>
-                        <h2 className="text-lg font-black text-amber-900 uppercase mb-2">Geliştiriciye Destek Olun</h2>
-                        <p className="text-amber-800/70 text-sm mb-8 max-w-xl mx-auto font-medium italic">Bu uygulama MEB Öğretmeni Davut KILIÇ tarafından meslektaşları için geliştirilmiştir.</p>
-                        <a href="https://www.buymeacoffee.com/kdavut" target="_blank" className="inline-flex items-center gap-4 bg-[#FFDD00] text-black px-10 py-5 rounded-2xl font-black text-xs uppercase shadow-xl hover:bg-[#FFCC00] transition-all group active:scale-95">
-                            <img src="https://cdn.buymeacoffee.com/widget/assets/queues/coffee.svg" alt="Coffee" className="w-6 h-6 group-hover:scale-110 transition-transform" />
-                            Kahve Ismarla (Support)
                         </a>
                     </div>
                 </div>
