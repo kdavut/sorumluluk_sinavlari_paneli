@@ -38,6 +38,7 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
   
   const [teacherForm, setTeacherForm] = useState({ id: null as number | null, name: '', branch: '' });
   const [notification, setNotification] = useState<string | null>(null);
+  const [mergeSourceId, setMergeSourceId] = useState<number | null>(null);
   
   const [loading, setLoading] = useState(true);
   const isInitialLoad = useRef(true);
@@ -143,6 +144,47 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
         examiners: Array(val).fill('').map((_, i) => prev.examiners[i] || '')
       }));
     }
+  };
+
+  const handleMergeExams = (targetId: number) => {
+    if (!mergeSourceId) {
+      setMergeSourceId(targetId);
+      showNotification("Birleştirilecek ilk sınav seçildi. Şimdi hedef sınavı seçin.");
+      return;
+    }
+
+    if (mergeSourceId === targetId) {
+      setMergeSourceId(null);
+      showNotification("Seçim iptal edildi.");
+      return;
+    }
+
+    const sourceExam = exams.find(ex => ex.id === mergeSourceId);
+    const targetExam = exams.find(ex => ex.id === targetId);
+
+    if (sourceExam && targetExam) {
+      // Create merged record
+      const mergedExam = {
+        ...targetExam,
+        subject: `${sourceExam.subject} / ${targetExam.subject}`,
+        grade: sourceExam.grade === targetExam.grade ? targetExam.grade : `${sourceExam.grade} / ${targetExam.grade}`,
+        studentCount: (parseInt(sourceExam.studentCount) || 0) + (parseInt(targetExam.studentCount) || 0),
+        // Use source's teachers as the base for the combined session
+        proctorCount: sourceExam.proctorCount,
+        examinerCount: sourceExam.examinerCount,
+        proctors: [...sourceExam.proctors],
+        examiners: [...sourceExam.examiners]
+      };
+
+      // Remove source from list and update target in one go
+      setExams(exams
+        .filter(ex => ex.id !== mergeSourceId)
+        .map(ex => ex.id === targetId ? mergedExam : ex)
+      );
+      
+      showNotification("Sınavlar ve görevliler başarıyla birleştirildi.");
+    }
+    setMergeSourceId(null);
   };
 
   const handleAddOrUpdateExam = (e: React.FormEvent) => {
@@ -301,25 +343,114 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
             {notification && <div className="fixed top-24 right-6 bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl z-50 text-xs font-black uppercase animate-in slide-in-from-right-10 border border-white/10 flex items-center gap-2"><Check className="w-4 h-4 text-emerald-400" /> {notification}</div>}
 
             {activeTab === 'settings' && (
-                <div className="grid md:grid-cols-2 gap-8 animate-in fade-in duration-500">
-                    <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 space-y-6">
-                        <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest border-b pb-4 flex items-center gap-2"><Settings className="w-4 h-4"/> Kurum ve Dönem Bilgileri</h2>
-                        <div className="space-y-4">
-                            <div><label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">Okul Adı</label><input type="text" value={settings.schoolName} onChange={e => setSettings({...settings, schoolName: e.target.value})} className="w-full p-3 bg-slate-50 border rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500 transition-all" /></div>
-                            <div><label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">Sınav Dönemi</label><input type="text" value={settings.examPeriod} onChange={e => setSettings({...settings, examPeriod: e.target.value})} className="w-full p-3 bg-slate-50 border rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500 transition-all" /></div>
-                            <div><label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">Okul Müdürü</label><input type="text" value={settings.principalName} onChange={e => setSettings({...settings, principalName: e.target.value})} className="w-full p-3 bg-slate-50 border rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500 transition-all" /></div>
+                <div className="space-y-8 animate-in fade-in duration-500">
+                    <div className="grid md:grid-cols-2 gap-8">
+                        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 space-y-6">
+                            <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest border-b pb-4 flex items-center gap-2"><Settings className="w-4 h-4"/> Kurum ve Dönem Bilgileri</h2>
+                            <div className="space-y-4">
+                                <div><label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">Okul Adı</label><input type="text" value={settings.schoolName} onChange={e => setSettings({...settings, schoolName: e.target.value})} className="w-full p-3 bg-slate-50 border rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500 transition-all" /></div>
+                                <div><label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">Sınav Dönemi</label><input type="text" value={settings.examPeriod} onChange={e => setSettings({...settings, examPeriod: e.target.value})} className="w-full p-3 bg-slate-50 border rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500 transition-all" /></div>
+                                <div><label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">Okul Müdürü</label><input type="text" value={settings.principalName} onChange={e => setSettings({...settings, principalName: e.target.value})} className="w-full p-3 bg-slate-50 border rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500 transition-all" /></div>
+                            </div>
+                        </div>
+                        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 space-y-8">
+                            <div>
+                                <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest border-b pb-4 mb-4">Takvim Tanımları</h2>
+                                <div className="flex gap-2 mb-4"><input type="date" id="dInp" className="flex-grow p-3 bg-slate-50 border rounded-xl text-sm outline-none" /><button onClick={() => { const el = document.getElementById('dInp') as HTMLInputElement; if(el.value && !settings.allowedDates.includes(el.value)) setSettings({...settings, allowedDates: [...settings.allowedDates, el.value].sort()}); }} className="bg-slate-900 text-white px-6 rounded-xl font-black transition hover:bg-black">+</button></div>
+                                <div className="flex flex-wrap gap-2">{settings.allowedDates.map(d => (<span key={d} className="bg-blue-50 text-blue-700 px-3 py-1.5 rounded-xl text-[10px] font-black border border-blue-100 flex items-center gap-2">{new Date(d).toLocaleDateString('tr-TR')}<button onClick={() => setSettings({...settings, allowedDates: settings.allowedDates.filter(x => x !== d)})} className="hover:text-red-500">×</button></span>))}</div>
+                            </div>
+                            <div>
+                                <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest border-b pb-4 mb-4">Saat Tanımları</h2>
+                                <div className="flex gap-2 mb-4"><input type="time" id="tInp" className="flex-grow p-3 bg-slate-50 border rounded-xl text-sm outline-none" /><button onClick={() => { const el = document.getElementById('tInp') as HTMLInputElement; if(el.value && !settings.allowedTimes.includes(el.value)) setSettings({...settings, allowedTimes: [...settings.allowedTimes, el.value].sort()}); }} className="bg-slate-900 text-white px-6 rounded-xl font-black transition hover:bg-black">+</button></div>
+                                <div className="flex flex-wrap gap-2">{settings.allowedTimes.map(t => (<span key={t} className="bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-xl text-[10px] font-black border border-emerald-100 flex items-center gap-2">{t}<button onClick={() => setSettings({...settings, allowedTimes: settings.allowedTimes.filter(x => x !== t)})} className="hover:text-red-500">×</button></span>))}</div>
+                            </div>
                         </div>
                     </div>
-                    <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 space-y-8">
-                        <div>
-                            <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest border-b pb-4 mb-4">Takvim Tanımları</h2>
-                            <div className="flex gap-2 mb-4"><input type="date" id="dInp" className="flex-grow p-3 bg-slate-50 border rounded-xl text-sm outline-none" /><button onClick={() => { const el = document.getElementById('dInp') as HTMLInputElement; if(el.value && !settings.allowedDates.includes(el.value)) setSettings({...settings, allowedDates: [...settings.allowedDates, el.value].sort()}); }} className="bg-slate-900 text-white px-6 rounded-xl font-black transition hover:bg-black">+</button></div>
-                            <div className="flex flex-wrap gap-2">{settings.allowedDates.map(d => (<span key={d} className="bg-blue-50 text-blue-700 px-3 py-1.5 rounded-xl text-[10px] font-black border border-blue-100 flex items-center gap-2">{new Date(d).toLocaleDateString('tr-TR')}<button onClick={() => setSettings({...settings, allowedDates: settings.allowedDates.filter(x => x !== d)})} className="hover:text-red-500">×</button></span>))}</div>
+
+                    <div className="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-200 text-left space-y-8 max-w-4xl mx-auto animate-in fade-in duration-700">
+                        <div className="border-b pb-6">
+                            <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tighter mb-4">SORUMLULUK SINAVI YÖNETİM PANELİ</h2>
+                            <p className="text-slate-600 text-sm leading-relaxed font-medium italic">
+                                Bu sistem, okulumuzdaki sorumluluk sınavlarının planlanması, öğretmen görevlendirmelerinin adil bir şekilde dağıtılması ve resmi belgelerin (görev tebliğ kağıtları, sınav programı vb.) hızlıca oluşturulması için tasarlanmıştır. Geliştirici Davut KILIÇ'a destek olmak için <a href="https://buymeacoffee.com/kdavut" target="_blank" className="text-blue-600 underline font-bold">https://buymeacoffee.com/kdavut</a> adresine tıklayabilirsiniz.
+                            </p>
                         </div>
-                        <div>
-                            <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest border-b pb-4 mb-4">Saat Tanımları</h2>
-                            <div className="flex gap-2 mb-4"><input type="time" id="tInp" className="flex-grow p-3 bg-slate-50 border rounded-xl text-sm outline-none" /><button onClick={() => { const el = document.getElementById('tInp') as HTMLInputElement; if(el.value && !settings.allowedTimes.includes(el.value)) setSettings({...settings, allowedTimes: [...settings.allowedTimes, el.value].sort()}); }} className="bg-slate-900 text-white px-6 rounded-xl font-black transition hover:bg-black">+</button></div>
-                            <div className="flex flex-wrap gap-2">{settings.allowedTimes.map(t => (<span key={t} className="bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-xl text-[10px] font-black border border-emerald-100 flex items-center gap-2">{t}<button onClick={() => setSettings({...settings, allowedTimes: settings.allowedTimes.filter(x => x !== t)})} className="hover:text-red-500">×</button></span>))}</div>
+
+                        <div className="space-y-8">
+                            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter flex items-center gap-2">🚀 KULLANIM KILAVUZU VE GÜNCELLEMELER HAKKINDA </h3>
+                            
+                             <div className="space-y-4">
+                            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter flex items-center gap-2">🛠️ Son Yapılan Güncellemeler (Sürüm Notları)</h3>
+                            <div className="text-sm text-slate-600 space-y-3 font-medium">
+                                <div className="flex gap-2">
+                                    <span className="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-[10px] font-black h-fit">DÜZELTME</span>
+                                    <p><strong>Çakışma Kontrolü:</strong> Aynı tarih ve saatte bir öğretmene birden fazla görev verilmesi engellendi.</p>
+                                </div>
+                                <div className="flex gap-2">
+                                    <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[10px] font-black h-fit">İYİLEŞTİRME</span>
+                                    <p><strong>PDF Tasarımı:</strong> Resmi yazı formatına uygun, okul müdürü imzalı görev tebliğ belgesi tasarımı güncellendi.</p>
+                                </div>
+                                 <div className="flex gap-2">
+                                    <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[10px] font-black h-fit">EKLEME</span>
+                                    <p><strong>SINAV BİRLEŞTİRME:</strong> Sınavlarda sadece birkaç öğrenci varsa Sınav Girişi sekmesi altında sınavların yanında bulunan "Görevlileri Birleştir" ikonu ile iki sınavı tek kayıtta birleştirebilirsiniz.</p>
+                                </div>
+                            </div>
+                        </div>
+                            
+                            <div className="space-y-8 text-sm text-slate-600">
+                                <div>
+                                    <h4 className="font-black text-slate-900 text-sm mb-1">Genel ayarların yapılandırılması (Ayarlar sekmesi)</h4>
+                                    <p>Okul Bilgileri: Okul adı, sınav dönemi ve okul müdürü bilgilerini girin. Bu bilgiler tüm resmi çıktılarda (Görev Kağıtları, Program vb.) otomatik olarak kullanılır.</p>
+                                    <p>TARİH VE SAATİ BİR KEZ GİRİN VE AÇILIR MENÜDE SADECE ONLAR ÇIKACAK</p>
+                                    <h4 className="font-black text-slate-900 text-sm mb-1">E-okul girişi > Ortaöğretim Kurum İşlemleri > Sorumluluk/Tasdikname > Hızlı Sorumluluk Girişi > Yazdır > Sorumlu Dersi Olan Öğrenciler ve Dersleri (Önceki Sınıflar Boş Not Çizelgesi) </h4>
+                                    <h4 className="font-black text-slate-900 text-sm mb-1"> BU DOSYAYA GÖRE SINAVLARINIZ, SEVİYE VE ÖĞRENCİ SAYISINI GİRİNİZ</h4>
+                                </div>
+
+                                <div>
+                                    <h4 className="font-black text-slate-900 text-sm mb-1">Öğretmen kadrosunu oluşturma (Öğretmenler sekmesi)</h4>
+                                    <p>Sınavlarda görev alacak tüm öğretmenleri Ad Soyad ve Branş bilgileriyle sisteme kaydedin. Listeden bir isme tıklayarak bilgilerini güncelleyebilir veya silebilirsiniz.</p>
+                                </div>
+
+                                <div>
+                                    <h4 className="font-black text-slate-900 text-sm mb-1">Sınavların tanımlanması (Sınav girişi sekmesi)</h4>
+                                    <p>Ders ve Seviye: Sınavı yapılacak dersi ve sınıf seviyesini seçin.</p>
+                                    <p>Görevli Atama: Sistem, seçtiğiniz tarih ve saatte başka bir sınavda görevi olan öğretmenleri listede göstermez (Çakışma Kontrolü).</p>
+                                    <p>Komisyon ve Gözetmen: İhtiyaca göre görevli sayılarını artırıp azaltabilirsiniz.</p>
+                                </div>
+
+                                <div>
+                                    <h4 className="font-black text-slate-900 text-sm mb-1">Takip ve istatistikler (Görev sayıları sekmesi)</h4>
+                                    <p>Bu sekmeden hangi öğretmenin kaç komisyon, kaç gözetmenlik görevi aldığını anlık olarak görebilirsiniz. Adil bir görev dağılımı yapmak için "Toplam" sütununu takip edebilirsiniz.</p>
+                                </div>
+
+                                <div>
+                                    <h4 className="font-black text-slate-900 text-sm mb-1">Yazdırma ve tebliğ (Görev kağıdı sekmesi)</h4>
+                                    <div className="space-y-2">
+                                        <p><strong>Tekli Yazdır:</strong> İstediğiniz öğretmenin görev belgesini hazırlar.</p>
+                                        <p><strong>Tümünü Yazdır:</strong> Tüm görevli öğretmenlerin belgelerini arka arkaya, her öğretmen yeni bir sayfaya gelecek şekilde PDF olarak hazırlar.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4 bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter flex items-center gap-2">💾 Veri Güvenliği ve Yedekleme</h3>
+                            <p className="text-sm text-slate-600 leading-relaxed">Sistem verileri Firebase ve tarayıcınızda tutar. Bilgisayar değişikliği yapacaksanız veya verileri garantiye almak istiyorsanız "Destek ve Yedekleme" sekmesini kullanın:</p>
+                            <ul className="text-sm text-slate-600 space-y-2 list-none pl-1">
+                                <li>-- <strong>Yedekle:</strong> Mevcut tüm sınav ve öğretmen verilerini .json dosyası olarak bilgisayarınıza indirir.</li>
+                                <li>-- <strong>Geri Yükle:</strong> Daha önce aldığınız yedek dosyasını sisteme geri yükler.</li>
+                                <li>-- <strong>Sıfırla:</strong> Yeni bir sınav dönemi başlangıcında tüm eski kayıtları temizlemek için kullanılır.</li>
+                            </ul>
+                        </div>
+                        
+                        <div className="pt-8 border-t border-slate-100 text-center space-y-4">
+                            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter flex items-center justify-center gap-2">☕ Destek</h3>
+                            <p className="text-sm text-slate-500 italic max-w-xl mx-auto leading-relaxed">
+                                Bu sistem tamamen okul ihtiyaçları doğrultusunda geliştirilmiştir. Memnun kaldıysanız Destek sekmesinden bir kahve ısmarlayarak katkıda bulunabilirsiniz!
+                            </p>
+                            <a href="https://buymeacoffee.com/kdavut" target="_blank" className="inline-flex items-center gap-3 bg-[#FFDD00] text-black px-8 py-4 rounded-2xl font-black text-xs uppercase shadow-xl hover:bg-[#FFCC00] transition-all group active:scale-95">
+                                <Coffee className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                                KAHVE ISMARLA (BU ME A COFFEE)
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -397,7 +528,20 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
                         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
                             <table className="w-full text-left text-xs font-bold">
                                 <thead className="bg-slate-50 border-b uppercase font-black text-slate-400 text-[10px]"><tr><th className="p-4">Tarih/Saat</th><th className="p-4">Ders / Seviye</th><th className="p-4">Görevliler</th><th className="p-4 text-center">İşlem</th></tr></thead>
-                                <tbody className="divide-y divide-slate-100">{sortedExams.map(ex => (<tr key={ex.id} onClick={() => { setEditingId(ex.id); setNewExam({...ex}); }} className={`hover:bg-slate-50 cursor-pointer transition-colors ${editingId === ex.id ? 'bg-blue-50 border-l-4 border-blue-600' : ''}`}><td className="p-4"><b>{new Date(ex.date).toLocaleDateString('tr-TR')}</b><br/><span className="text-blue-600">{ex.time}</span></td><td className="p-4 uppercase">{ex.subject}<br/><span className="text-slate-400 text-[9px]">{ex.grade} • {ex.studentCount} Öğr.</span></td><td className="p-4"><div className="flex flex-wrap gap-1">{ex.examiners && ex.examiners.filter((n:any)=>n).map((n:any, i:any) => <span key={i} className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-lg text-[9px] border border-blue-100">A: {n}</span>)}{ex.proctors && ex.proctors.filter((n:any)=>n).map((n:any, i:any) => <span key={i} className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-lg text-[9px] border border-emerald-100">G: {n}</span>)}</div></td><td className="p-4 text-center"><button onClick={(e) => { e.stopPropagation(); if(confirm('Sınav kaydını silmek istediğinize emin misiniz?')) setExams(exams.filter(x => x.id !== ex.id)); if(editingId === ex.id) setEditingId(null); }} className="text-slate-300 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button></td></tr>))}</tbody>
+                                <tbody className="divide-y divide-slate-100">{sortedExams.map(ex => (<tr key={ex.id} onClick={() => { setEditingId(ex.id); setNewExam({...ex}); }} className={`hover:bg-slate-50 cursor-pointer transition-colors ${editingId === ex.id ? 'bg-blue-50 border-l-4 border-blue-600' : ''}`}><td className="p-4"><b>{new Date(ex.date).toLocaleDateString('tr-TR')}</b><br/><span className="text-blue-600">{ex.time}</span></td><td className="p-4 uppercase">{ex.subject}<br/><span className="text-slate-400 text-[9px]">{ex.grade} • {ex.studentCount} Öğr.</span></td><td className="p-4"><div className="flex flex-wrap gap-1">{ex.examiners && ex.examiners.filter((n:any)=>n).map((n:any, i:any) => <span key={i} className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-lg text-[9px] border border-blue-100">A: {n}</span>)}{ex.proctors && ex.proctors.filter((n:any)=>n).map((n:any, i:any) => <span key={i} className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-lg text-[9px] border border-emerald-100">G: {n}</span>)}</div></td><td className="p-4 text-center">
+                                  <div className="flex items-center justify-center gap-2">
+                                    <button 
+                                        onClick={(e) => { e.stopPropagation(); handleMergeExams(ex.id); }} 
+                                        className={`p-1.5 rounded-lg transition-all ${mergeSourceId === ex.id ? 'bg-blue-600 text-white shadow-lg scale-110' : 'text-slate-400 hover:text-blue-600 hover:bg-blue-50'}`}
+                                        title={mergeSourceId ? "Buraya Birleştir" : "Görevlileri Birleştir"}
+                                    >
+                                        <Users className="w-4 h-4" />
+                                    </button>
+                                    <button onClick={(e) => { e.stopPropagation(); if(confirm('Sınav kaydını silmek istediğinize emin misiniz?')) setExams(exams.filter(x => x.id !== ex.id)); if(editingId === ex.id) setEditingId(null); }} className="p-1.5 text-slate-300 hover:text-red-500 transition-colors">
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                </td></tr>))}</tbody>
                             </table>
                             {sortedExams.length === 0 && <div className="p-10 text-center text-slate-300 uppercase font-black text-xs tracking-widest italic">Henüz sınav planlanmadı.</div>}
                         </div>
@@ -510,87 +654,6 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
                             <h3 className="font-black text-slate-800 uppercase text-xs mb-2">Sistemi Temizle</h3>
                             <p className="text-[10px] text-slate-400 mb-6 italic">Tüm öğretmen ve sınav kayıtlarını kalıcı olarak siler.</p>
                             <button onClick={() => { if(confirm("Tüm kayıtlar SİLİNECEKTİR! Geri dönüşü yoktur. Emin misiniz?")) { setExams([]); setTeachers([]); showNotification("Sistem tamamen sıfırlandı."); } }} className="w-full bg-red-50 text-red-600 py-4 rounded-xl font-black text-[10px] uppercase hover:bg-red-100 transition-all active:scale-95 shadow-sm">SİSTEMİ SIFIRLA</button>
-                        </div>
-                    </div>
-
-                    <div className="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-200 text-left space-y-8 animate-in fade-in duration-700">
-                        <div className="border-b pb-6">
-                            <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tighter mb-4">SORUMLULUK SINAVI YÖNETİM PANELİ</h2>
-                            <p className="text-slate-600 text-sm leading-relaxed font-medium italic">
-                                Bu sistem, okulumuzdaki sorumluluk sınavlarının planlanması, öğretmen görevlendirmelerinin adil bir şekilde dağıtılması ve resmi belgelerin (görev tebliğ kağıtları, sınav programı vb.) hızlıca oluşturulması için tasarlanmıştır. Geliştirici Davut KILIÇ'a destek olmak için <a href="https://buymeacoffee.com/kdavut" target="_blank" className="text-blue-600 underline font-bold">https://buymeacoffee.com/kdavut</a> adresine tıklayabilirsiniz.
-                            </p>
-                        </div>
-
-                        <div className="space-y-8">
-                            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter flex items-center gap-2">🚀 Hızlı Başlangıç Adımları</h3>
-                            
-                            <div className="space-y-8 text-sm text-slate-600">
-                                <div>
-                                    <h4 className="font-black text-slate-900 text-sm mb-1">Genel ayarların yapılandırılması (Ayarlar sekmesi)</h4>
-                                    <p>Okul Bilgileri: Okul adı, sınav dönemi ve okul müdürü bilgilerini girin. Bu bilgiler tüm resmi çıktılarda (Görev Kağıtları, Program vb.) otomatik olarak kullanılır.</p>
-                                    <p className="font-black text-slate-900 text-sm mb-1 italic">Tarih ve saati sadece bir kez Ayarlar sekmesinden girin. Sınavları girerken sadece o tarih ve saat çıkacaktır</p>
-                                </div>
-
-                                <div>
-                                    <h4 className="font-black text-slate-900 text-sm mb-1">Öğretmen kadrosunu oluşturma (Öğretmenler sekmesi)</h4>
-                                    <p>Sınavlarda görev alacak tüm öğretmenleri Ad Soyad ve Branş bilgileriyle sisteme kaydedin. Listeden bir isme tıklayarak bilgilerini güncelleyebilir veya silebilirsiniz.</p>
-                                </div>
-
-                                <div>
-                                    <h4 className="font-black text-slate-900 text-sm mb-1">Sınavların tanımlanması (Sınav girişi sekmesi)</h4>
-                                    <p>Ders ve Seviye: Sınavı yapılacak dersi ve sınıf seviyesini seçin.</p>
-                                    <p>Görevli Atama: Sistem, seçtiğiniz tarih ve saatte başka bir sınavda görevi olan öğretmenleri listede göstermez (Çakışma Kontrolü).</p>
-                                    <p>Komisyon ve Gözetmen: İhtiyaca göre görevli sayılarını artırıp azaltabilirsiniz.</p>
-                                </div>
-
-                                <div>
-                                    <h4 className="font-black text-slate-900 text-sm mb-1">Takip ve istatistikler (Görev sayıları sekmesi)</h4>
-                                    <p>Bu sekmeden hangi öğretmenin kaç komisyon, kaç gözetmenlik görevi aldığını anlık olarak görebilirsiniz. Adil bir görev dağılımı yapmak için "Toplam" sütununu takip edebilirsiniz.</p>
-                                </div>
-
-                                <div>
-                                    <h4 className="font-black text-slate-900 text-sm mb-1">Yazdırma ve tebliğ (Görev kağıdı sekmesi)</h4>
-                                    <div className="space-y-2">
-                                        <p><strong>Tekli Yazdır:</strong> İstediğiniz öğretmenin görev belgesini hazırlar.</p>
-                                        <p><strong>Tümünü Yazdır:</strong> Tüm görevli öğretmenlerin belgelerini arka arkaya, her öğretmen yeni bir sayfaya gelecek şekilde PDF olarak hazırlar.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="space-y-4 bg-slate-50 p-6 rounded-3xl border border-slate-100">
-                            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter flex items-center gap-2">💾 Veri Güvenliği ve Yedekleme</h3>
-                            <p className="text-sm text-slate-600 leading-relaxed">Sistem verileri Firebase ve tarayıcınızda tutar. Bilgisayar değişikliği yapacaksanız veya verileri garantiye almak istiyorsanız "Destek ve Yedekleme" sekmesini kullanın:</p>
-                            <ul className="text-sm text-slate-600 space-y-2 list-none pl-1">
-                                <li>-- <strong>Yedekle:</strong> Mevcut tüm sınav ve öğretmen verilerini .json dosyası olarak bilgisayarınıza indirir.</li>
-                                <li>-- <strong>Geri Yükle:</strong> Daha önce aldığınız yedek dosyasını sisteme geri yükler.</li>
-                                <li>-- <strong>Sıfırla:</strong> Yeni bir sınav dönemi başlangıcında tüm eski kayıtları temizlemek için kullanılır.</li>
-                            </ul>
-                        </div>
-
-                        <div className="space-y-4">
-                            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter flex items-center gap-2">🛠️ Son Yapılan Güncellemeler (Sürüm Notları)</h3>
-                            <div className="text-sm text-slate-600 space-y-3 font-medium">
-                                <div className="flex gap-2">
-                                    <span className="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-[10px] font-black h-fit">DÜZELTME</span>
-                                    <p><strong>Çakışma Kontrolü:</strong> Aynı tarih ve saatte bir öğretmene birden fazla görev verilmesi engellendi.</p>
-                                </div>
-                                <div className="flex gap-2">
-                                    <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[10px] font-black h-fit">İYİLEŞTİRME</span>
-                                    <p><strong>PDF Tasarımı:</strong> Resmi yazı formatına uygun, okul müdürü imzalı görev tebliğ belgesi tasarımı güncellendi.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="pt-8 border-t border-slate-100 text-center space-y-4">
-                            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter flex items-center justify-center gap-2">☕ Destek</h3>
-                            <p className="text-sm text-slate-500 italic max-w-xl mx-auto leading-relaxed">
-                                Bu sistem tamamen okul ihtiyaçları doğrultusunda geliştirilmiştir. Memnun kaldıysanız Destek sekmesinden bir kahve ısmarlayarak katkıda bulunabilirsiniz!
-                            </p>
-                            <a href="https://buymeacoffee.com/kdavut" target="_blank" className="inline-flex items-center gap-3 bg-[#FFDD00] text-black px-8 py-4 rounded-2xl font-black text-xs uppercase shadow-xl hover:bg-[#FFCC00] transition-all group active:scale-95">
-                                <Coffee className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                                KAHVE ISMARLA (BU ME A COFFEE)
-                            </a>
                         </div>
                     </div>
                 </div>
