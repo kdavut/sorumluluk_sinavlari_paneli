@@ -104,7 +104,6 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
     return teachers.map(t => {
       let p = 0, e = 0;
       exams.forEach(ex => {
-        // null/undefined kontrolü eklenerek verilerin gelmeme sorunu giderildi
         if (ex.proctors && Array.isArray(ex.proctors) && ex.proctors.includes(t.name)) p++;
         if (ex.examiners && Array.isArray(ex.examiners) && ex.examiners.includes(t.name)) e++;
       });
@@ -163,20 +162,17 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
     const targetExam = exams.find(ex => ex.id === targetId);
 
     if (sourceExam && targetExam) {
-      // Create merged record
       const mergedExam = {
         ...targetExam,
         subject: `${sourceExam.subject} / ${targetExam.subject}`,
         grade: sourceExam.grade === targetExam.grade ? targetExam.grade : `${sourceExam.grade} / ${targetExam.grade}`,
         studentCount: (parseInt(sourceExam.studentCount) || 0) + (parseInt(targetExam.studentCount) || 0),
-        // Use source's teachers as the base for the combined session
         proctorCount: sourceExam.proctorCount,
         examinerCount: sourceExam.examinerCount,
         proctors: [...sourceExam.proctors],
         examiners: [...sourceExam.examiners]
       };
 
-      // Remove source from list and update target in one go
       setExams(exams
         .filter(ex => ex.id !== mergeSourceId)
         .map(ex => ex.id === targetId ? mergedExam : ex)
@@ -401,7 +397,9 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
                                     <h4 className="font-black text-slate-900 text-sm mb-1">Genel ayarların yapılandırılması (Ayarlar sekmesi)</h4>
                                     <p>Okul Bilgileri: Okul adı, sınav dönemi ve okul müdürü bilgilerini girin. Bu bilgiler tüm resmi çıktılarda (Görev Kağıtları, Program vb.) otomatik olarak kullanılır.</p>
                                     <p>TARİH VE SAATİ BİR KEZ GİRİN VE AÇILIR MENÜDE SADECE ONLAR ÇIKACAK</p>
-                                    <h4 className="font-black text-slate-900 text-sm mb-1">E-okul girişi > Ortaöğretim Kurum İşlemleri > Sorumluluk/Tasdikname > Hızlı Sorumluluk Girişi > Yazdır > Sorumlu Dersi Olan Öğrenciler ve Dersleri (Önceki Sınıflar Boş Not Çizelgesi) </h4>
+                                    <h4 className="font-black text-slate-900 text-sm mb-1">
+                                      E-okul girişi &rarr; Ortaöğretim Kurum İşlemleri &rarr; Sorumluluk/Tasdikname &rarr; Hızlı Sorumluluk Girişi &rarr; Yazdır &rarr; Sorumlu Dersi Olan Öğrenciler ve Dersleri (Önceki Sınıflar Boş Not Çizelgesi)
+                                    </h4>
                                     <h4 className="font-black text-slate-900 text-sm mb-1"> BU DOSYAYA GÖRE SINAVLARINIZ, SEVİYE VE ÖĞRENCİ SAYISINI GİRİNİZ</h4>
                                 </div>
 
@@ -664,7 +662,6 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
             &copy; {new Date().getFullYear()} {settings.schoolName} &bull; Sorumluluk Sınav Yönetim Paneli
         </footer>
 
-        {/* --- YAZDIRMA ALANI (PRINT ONLY) --- */}
         <div className="print-only">
             {printMode === 'program_pdf' && (
                 <div className="print-container p-4">
