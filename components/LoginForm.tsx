@@ -55,7 +55,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
     <div className="bg-white/95 backdrop-blur-sm p-10 rounded-[2.5rem] shadow-2xl border border-white/20 space-y-8 animate-in fade-in zoom-in duration-300">
       <div className="text-center">
         <div className="bg-gradient-to-tr from-blue-600 to-indigo-600 w-20 h-20 rounded-3xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl shadow-blue-500/30">
-          <GraduationCap className="w-10 h-10" />
+          < GraduationCap className="w-10 h-10" />
         </div>
         <h1 className="text-3xl font-black text-slate-800 uppercase tracking-tighter">Sistem Girişi</h1>
         <p className="text-slate-500 text-sm mt-2 font-medium italic">Sorumluluk sınavları yönetim paneli</p>
@@ -108,7 +108,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
 
       <div className="text-center pt-6 border-t border-slate-100">
          <p className="text-[10px] text-slate-400 font-bold leading-relaxed uppercase tracking-tight">
-          Giriş Yetkisi & Lisanslama <br/>
+          Giriş Yetkisi &amp; Lisanslama <br/>
           <span className="font-medium normal-case text-slate-500 block mt-1">
             Sistemi kullanmak için kurumunuza özel giriş yetkisi tanımlanması gerekmektedir.
           </span>
