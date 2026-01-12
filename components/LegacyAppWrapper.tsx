@@ -20,8 +20,8 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
     { id: 1, name: "Örnek Öğretmen", branch: "Matematik" }
   ]);
   const [settings, setSettings] = useState({
-    schoolName: 'İBNİ SİNA MESLEKİ VE TEKNİK ANADOLU LİSESİ',
-    examPeriod: '2024-2025 EĞİTİM ÖĞRETİM YILI ŞUBAT DÖNEMİ',
+    schoolName: '',
+    examPeriod: '',
     principalName: 'Okul Müdürü Adı',
     allowedDates: [] as string[],
     allowedTimes: [] as string[]
@@ -367,7 +367,7 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
                         <div className="border-b pb-6">
                             <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tighter mb-4">SORUMLULUK SINAVI YÖNETİM PANELİ</h2>
                             <p className="text-slate-600 text-sm leading-relaxed font-medium italic">
-                                Bu sistem, okulumuzdaki sorumluluk sınavlarının planlanması, öğretmen görevlendirmelerinin adil bir şekilde dağıtılması ve resmi belgelerin (görev tebliğ kağıtları, sınav programı vb.) hızlıca oluşturulması için tasarlanmıştır. Geliştirici Davut KILIÇ'a destek olmak için <a href="https://buymeacoffee.com/kdavut" target="_blank" className="text-blue-600 underline font-bold">https://buymeacoffee.com/kdavut</a> adresine tıklayabilirsiniz.
+                                Bu sistem, okulumuzdaki sorumluluk sınavlarının planlanması, öğretmen görevlendirmelerinin adil bir şekilde dağıtılması ve resmi belgelerin (görev tebliğ kağıtları, sınav programı vb.) hızlıca oluşturulması için tasarlanmıştır. Teknik destek, giriş yetkisi ve fiyatlandırma için geliştirici Davut KILIÇ (MEB)'a davutk144@gmail.com yoluyla talebinizi iletiniz.'
                             </p>
                         </div>
 
@@ -401,18 +401,6 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
                                       E-okul girişi &rarr; Ortaöğretim Kurum İşlemleri &rarr; Sorumluluk/Tasdikname &rarr; Hızlı Sorumluluk Girişi &rarr; Yazdır &rarr; Sorumlu Dersi Olan Öğrenciler ve Dersleri (Önceki Sınıflar Boş Not Çizelgesi)
                                     </h4>
                                     <h4 className="font-black text-slate-900 text-sm mb-1"> BU DOSYAYA GÖRE SINAVLARINIZ, SEVİYE VE ÖĞRENCİ SAYISINI GİRİNİZ</h4>
-                                </div>
-
-                                <div>
-                                    <h4 className="font-black text-slate-900 text-sm mb-1">Öğretmen kadrosunu oluşturma (Öğretmenler sekmesi)</h4>
-                                    <p>Sınavlarda görev alacak tüm öğretmenleri Ad Soyad ve Branş bilgileriyle sisteme kaydedin. Listeden bir isme tıklayarak bilgilerini güncelleyebilir veya silebilirsiniz.</p>
-                                </div>
-
-                                <div>
-                                    <h4 className="font-black text-slate-900 text-sm mb-1">Sınavların tanımlanması (Sınav girişi sekmesi)</h4>
-                                    <p>Ders ve Seviye: Sınavı yapılacak dersi ve sınıf seviyesini seçin.</p>
-                                    <p>Görevli Atama: Sistem, seçtiğiniz tarih ve saatte başka bir sınavda görevi olan öğretmenleri listede göstermez (Çakışma Kontrolü).</p>
-                                    <p>Komisyon ve Gözetmen: İhtiyaca göre görevli sayılarını artırıp azaltabilirsiniz.</p>
                                 </div>
 
                                 <div>
@@ -527,16 +515,21 @@ export const LegacyAppWrapper: React.FC<LegacyAppWrapperProps> = ({ user, onLogo
                             <table className="w-full text-left text-xs font-bold">
                                 <thead className="bg-slate-50 border-b uppercase font-black text-slate-400 text-[10px]"><tr><th className="p-4">Tarih/Saat</th><th className="p-4">Ders / Seviye</th><th className="p-4">Görevliler</th><th className="p-4 text-center">İşlem</th></tr></thead>
                                 <tbody className="divide-y divide-slate-100">{sortedExams.map(ex => (<tr key={ex.id} onClick={() => { setEditingId(ex.id); setNewExam({...ex}); }} className={`hover:bg-slate-50 cursor-pointer transition-colors ${editingId === ex.id ? 'bg-blue-50 border-l-4 border-blue-600' : ''}`}><td className="p-4"><b>{new Date(ex.date).toLocaleDateString('tr-TR')}</b><br/><span className="text-blue-600">{ex.time}</span></td><td className="p-4 uppercase">{ex.subject}<br/><span className="text-slate-400 text-[9px]">{ex.grade} • {ex.studentCount} Öğr.</span></td><td className="p-4"><div className="flex flex-wrap gap-1">{ex.examiners && ex.examiners.filter((n:any)=>n).map((n:any, i:any) => <span key={i} className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-lg text-[9px] border border-blue-100">A: {n}</span>)}{ex.proctors && ex.proctors.filter((n:any)=>n).map((n:any, i:any) => <span key={i} className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-lg text-[9px] border border-emerald-100">G: {n}</span>)}</div></td><td className="p-4 text-center">
-                                  <div className="flex items-center justify-center gap-2">
+                                  <div className="flex flex-col sm:flex-row items-center justify-center gap-1.5">
                                     <button 
                                         onClick={(e) => { e.stopPropagation(); handleMergeExams(ex.id); }} 
-                                        className={`p-1.5 rounded-lg transition-all ${mergeSourceId === ex.id ? 'bg-blue-600 text-white shadow-lg scale-110' : 'text-slate-400 hover:text-blue-600 hover:bg-blue-50'}`}
-                                        title={mergeSourceId ? "Buraya Birleştir" : "Görevlileri Birleştir"}
+                                        className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all ${mergeSourceId === ex.id ? 'bg-blue-600 text-white shadow-lg' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
+                                        title={mergeSourceId ? "Buraya Birleştir" : "Sınav Birleştir"}
                                     >
-                                        <Users className="w-4 h-4" />
+                                        <Users className="w-3 h-3" />
+                                        <span>BİRLEŞTİR</span>
                                     </button>
-                                    <button onClick={(e) => { e.stopPropagation(); if(confirm('Sınav kaydını silmek istediğinize emin misiniz?')) setExams(exams.filter(x => x.id !== ex.id)); if(editingId === ex.id) setEditingId(null); }} className="p-1.5 text-slate-300 hover:text-red-500 transition-colors">
-                                        <Trash2 className="w-4 h-4" />
+                                    <button 
+                                        onClick={(e) => { e.stopPropagation(); if(confirm('Sınav kaydını silmek istediğinize emin misiniz?')) setExams(exams.filter(x => x.id !== ex.id)); if(editingId === ex.id) setEditingId(null); }} 
+                                        className="flex items-center gap-1 px-2.5 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-[10px] font-black uppercase transition-all"
+                                    >
+                                        <Trash2 className="w-3 h-3" />
+                                        <span>SİL</span>
                                     </button>
                                   </div>
                                 </td></tr>))}</tbody>
