@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-// Fixed: Ensure modular imports for onAuthStateChanged and signOut
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from './services/firebase';
 import { LoginForm } from './components/LoginForm';
@@ -12,7 +11,6 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Fixed: Using the correct modular pattern for onAuthStateChanged
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       if (u) {
         setUser({ 
@@ -35,7 +33,6 @@ const App: React.FC = () => {
   const handleLogout = async () => {
     if(window.confirm("Güvenli çıkış yapmak istediğinize emin misiniz?")) {
       try {
-        // Fixed: Using the correct modular pattern for signOut
         await signOut(auth);
       } catch (error) {
         console.error("Logout Error:", error);
@@ -56,7 +53,7 @@ const App: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-100">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#4c1d95]">
         <div className="w-full max-w-md">
           <LoginForm onSuccess={(u) => setUser(u)} />
         </div>
